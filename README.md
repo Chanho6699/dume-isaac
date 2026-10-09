@@ -53,31 +53,39 @@ Isaac Sim/Lab은 pip dependency가 아니며 학교에 설치된 Isaac Lab을 �
 
 ## Scripts (실행 순서)
 
-| # | Script | Stage | Isaac |
-|---|---|---|---|
-| 01 | `script01_check_environment.py` | 0 | 선택 |
-| 02 | `script02_fetch_so101_source.py` | 1 | no |
-| 03 | `script03_inspect_so101_urdf.py` | 1 | no |
-| 04 | `script04_convert_so101_to_usd.py` | 2 | yes |
-| 05 | `script05_smoke_test_so101.py` | 3 | yes |
-| 06 | `script06_test_joint_motion.py` | 4 | yes |
-| 07 | `script07_run_tabletop_scene.py` | 5 | yes |
-| 08 | `script08_random_policy.py --task reach` / `--task pick_place` | 6 / 8 | yes |
-| 09 | `script09_train_reach_ppo.py` | 7 | yes |
-| 10 | `script10_play_reach_ppo.py` | 7 | yes |
-| 11 | `script11_train_pick_place_ppo.py` | 9 | yes |
-| 12 | `script12_play_pick_place_ppo.py` | 9 | yes |
+| # | Script | Stage | 내용 | Isaac |
+|---|---|---|---|---|
+| 01 | `script01_check_environment.py` | 0 | Isaac Sim/Lab, Python, GPU 등 실행 환경 확인 | 선택 |
+| 02 | `script02_fetch_so101_source.py` | 1 | 공식 SO-101 URDF/mesh를 pinned commit에서 다운로드·검증 | no |
+| 03 | `script03_inspect_so101_urdf.py` | 1 | URDF의 joint/frame/limit과 `my_so101` 매핑 검사 | no |
+| 04 | `script04_convert_so101_to_usd.py` | 2 | SO-101 URDF를 Isaac용 USD로 변환 | yes |
+| 05 | `script05_smoke_test_so101.py` | 3 | SO-101 spawn 및 articulation/frame/물리 기본 상태 확인 | yes |
+| 06 | `script06_test_joint_motion.py` | 4 | 5개 arm joint + gripper를 하나씩 움직여 동작 검증 | yes |
+| 07 | `script07_run_tabletop_scene.py` | 5 | table + SO-101 + cube + target 작업환경 실행 | yes |
+| 08 | `script08_random_policy.py --task reach` / `--task pick_place` | 6 / 8 | PPO 전 reset/action/reward/termination 환경 sanity test | yes |
+| 09 | `script09_train_reach_ppo.py` | 7 | 목표 위치까지 EE를 이동시키는 Reach PPO 학습 | yes |
+| 10 | `script10_play_reach_ppo.py` | 7 | 학습된 Reach PPO checkpoint 실행·확인 | yes |
+| 11 | `script11_train_pick_place_ppo.py` | 9 | cube를 target에 놓는 Pick-and-Place PPO teacher 학습 | yes |
+| 12 | `script12_play_pick_place_ppo.py` | 9 | 학습된 Pick-and-Place PPO checkpoint 실행·평가 | yes |
 
 학교 실행 절차와 단계별 PASS 기준: **[docs/school_runtime_checklist.md](docs/school_runtime_checklist.md)**
 
 ```bash
 cd ~/Projects/dume-isaac && git pull
 export ISAACLAB=<ISAACLAB_PATH>/isaaclab.sh
+
+# Stage 0: 학교 Isaac 환경 확인
 $ISAACLAB -p scripts/script01_check_environment.py --try-import
+
+# Stage 1: 공식 SO-101 source 준비 및 URDF 검증
 python scripts/script02_fetch_so101_source.py
 python scripts/script03_inspect_so101_urdf.py
+
+# Stage 2: URDF → USD 변환
 $ISAACLAB -p scripts/script04_convert_so101_to_usd.py --headless
-# ... Stage 3-9: checklist 참조
+
+# Stage 3~9: robot → joints → tabletop → RL sanity → PPO
+# 자세한 명령과 PASS 기준은 docs/school_runtime_checklist.md 참고
 ```
 
 ## 테스트 종류
