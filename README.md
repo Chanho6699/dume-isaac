@@ -5,7 +5,7 @@ Project-Dum-E를 위한 **Isaac Sim / Isaac Lab 전용 시뮬레이션·학습 �
 | Repo | 역할 |
 |---|---|
 | `physical-ai-dume` | 실제 로봇 시스템 (real robot, R3D/wrist 카메라, SAM2 VisualCue, 실제 제어) |
-| `dume-isaac` (이 repo) | 시뮬레이션 / 학습 실험 |
+| `dume-isaac` (이 repo) | 시뮬레이션 / 학습 실험 / 강화 학습 / 환경 다양화 / 조건별 실험 |
 
 두 repo는 코드 의존성 없이 분리되어 있다. 관측/행동의 의미 대응은
 [docs/real_sim_contract.md](docs/real_sim_contract.md) 문서 계약으로만 맞춘다.
