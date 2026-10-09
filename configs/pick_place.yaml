@@ -1,0 +1,50 @@
+# Pick-and-place full-state PPO teacher: blue cube -> target pad.
+# All thresholds/weights are provisional simulation values to tune at school.
+# Structure follows the Isaac Lab v2.3.2 manipulation/lift task
+# (reach object -> lifted -> object-goal tracking) plus grasp/descend/place stages.
+
+difficulty: easy            # default; override with --difficulty
+
+sim:
+  dt: 0.01                  # as the official lift task
+  decimation: 2
+episode_length_s: 8.0
+
+actions:
+  arm_scale: 0.5
+  # binary = Isaac Lab BinaryJointPositionAction (official lift pattern; open/close
+  # from configs/my_so101.yaml gripper.open/closed). continuous = JointPositionAction.
+  gripper: binary
+
+thresholds:
+  grasp_radius: 0.02        # EE(TCP)-cube distance for the grasp proxy
+  hold_radius: 0.04         # cube within this of the TCP and off the table => "held"
+  held_min_height: 0.01     # cube bottom above table by this => off the table
+  lift_height: 0.04         # height above resting for full lift reward / was_lifted flag
+  place_xy_margin: 0.005    # cube center must be inside pad half-size minus this
+  place_height_tol: 0.006   # |cube z - resting z| for "resting on table"
+  place_max_speed: 0.05     # m/s
+  place_hold_steps: 5       # consecutive placed steps => success
+  require_gripper_open: true
+  require_was_lifted: true  # pushing the cube onto the pad without lifting is not success
+  out_of_bounds_margin: 0.10
+  drop_height: -0.05        # cube below table top by this => dropped off the table
+
+rewards:
+  reach_object: {weight: 1.0, std: 0.05}      # official lift: reaching_object w1 std0.1
+  grasp:        {weight: 2.0}
+  lift:         {weight: 4.0}                 # held * (over target ? 1 : min(height/lift_height, 1))
+  carry:        {weight: 6.0, std: 0.10}      # held * (1 - tanh(xy dist / std))
+  carry_fine:   {weight: 4.0, std: 0.02}
+  descend:      {weight: 4.0, std: 0.02}      # held & over pad: reward lowering
+  # Anti-hover is checked on whole-episode returns (undiscounted and gamma=0.98) of scripted
+  # hover / carry / set-down / push policies vs placing: tests/test_reward_audit.py.
+  # Re-run it after changing any weight or threshold here.
+  place:        {weight: 30.0}
+  dropped:      {weight: -5.0}
+  action_rate:  {weight: -1.0e-4, final_weight: -1.0e-1, curriculum_steps: 10000}  # official lift
+  joint_vel:    {weight: -1.0e-4, final_weight: -1.0e-1, curriculum_steps: 10000}
+
+# With positive per-step rewards, ending the episode on success makes the policy
+# prefer farming "held" rewards. Keep false for training; success is still logged.
+terminate_on_success: false

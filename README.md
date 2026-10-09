@@ -10,6 +10,9 @@ Project-Dum-E를 위한 **Isaac Sim / Isaac Lab 전용 시뮬레이션·학습 �
 두 repo는 코드 의존성 없이 분리되어 있다. 관측/행동의 의미 대응은
 [docs/real_sim_contract.md](docs/real_sim_contract.md) 문서 계약으로만 맞춘다.
 
+**Compatibility target (확정):** Isaac Sim 5.1.0 / Isaac Lab v2.3.2 / Python 3.11 / RTX 5060 Laptop.
+Isaac Sim/Lab은 pip dependency가 아니며 학교에 설치된 Isaac Lab을 쓴다.
+
 ## 목표
 
 1. SO-101 tabletop simulation
@@ -19,54 +22,88 @@ Project-Dum-E를 위한 **Isaac Sim / Isaac Lab 전용 시뮬레이션·학습 �
 5. synthetic demonstrations
 6. sim-to-real evaluation
 
-자세한 단계는 [docs/roadmap.md](docs/roadmap.md).
-
 ## 현재 상태
 
-Foundation only. Isaac Sim scene, Isaac Lab EnvCfg, PPO 코드는 **아직 없다.**
-학교 노트북은 Isaac Sim 5.1.x / Python 3.11로 *추정*되지만 Isaac Lab 버전은 미확인이므로,
-버전에 묶이는 코드는 환경 확인 후 작성한다.
+"Implemented" = 코드 있음 + 집 static/unit test 통과. "Runtime validated" = 학교 Isaac에서 해당 Stage PASS.
 
-## 학교에서 첫 실행 순서
+| 단계 | Implemented locally | Runtime validated on Isaac 5.1.0 |
+|---|---|---|
+| Stage 0 environment check | YES | NO |
+| Stage 1 official source fetch + URDF inspect | YES | N/A (Isaac 불필요) — 집에서 실행 PASS |
+| Stage 2 URDF → USD | YES | NO |
+| Stage 3 robot spawn smoke test | YES | NO |
+| Stage 4 joint motion test | YES | NO |
+| Stage 5 tabletop scene | YES | NO |
+| Stage 6 Reach random-policy gate | YES | NO |
+| Stage 7 Reach PPO train/play | YES | NO |
+| Stage 8 Pick-place random-policy gate | YES | NO |
+| Stage 9 Pick-place PPO train/play | YES | NO |
+| Vision ActorObservation / distillation / SmolVLA | NO | NO |
+
+로드맵: [docs/roadmap.md](docs/roadmap.md)
+
+## SO-101 asset: `my_so101`
+
+- Isaac Lab v2.3.2에는 `SO101_CFG`가 없으므로 이 repo가 `MY_SO101_CFG`를 직접 관리한다.
+- **Source 방식: pinned fetch.** 공식 `TheRobotStudio/SO-ARM100`의 commit 하나에 고정하고
+  파일별 sha256을 [source_manifest.yaml](dume_isaac/assets/my_so101/source_manifest.yaml)에 기록.
+  `script02`가 그 파일만 받아 검증한다 (upstream과 byte-identical, git에는 manifest만 커밋).
+- joint/frame 이름은 [configs/my_so101.yaml](configs/my_so101.yaml) 한 곳에서만 매핑한다.
+- actuator/home/gripper 값은 **provisional simulation value**이며 Brain Us 실물 검증값이 아니다.
+
+## Scripts (실행 순서)
+
+| # | Script | Stage | Isaac |
+|---|---|---|---|
+| 01 | `script01_check_environment.py` | 0 | 선택 |
+| 02 | `script02_fetch_so101_source.py` | 1 | no |
+| 03 | `script03_inspect_so101_urdf.py` | 1 | no |
+| 04 | `script04_convert_so101_to_usd.py` | 2 | yes |
+| 05 | `script05_smoke_test_so101.py` | 3 | yes |
+| 06 | `script06_test_joint_motion.py` | 4 | yes |
+| 07 | `script07_run_tabletop_scene.py` | 5 | yes |
+| 08 | `script08_random_policy.py --task reach` / `--task pick_place` | 6 / 8 | yes |
+| 09 | `script09_train_reach_ppo.py` | 7 | yes |
+| 10 | `script10_play_reach_ppo.py` | 7 | yes |
+| 11 | `script11_train_pick_place_ppo.py` | 9 | yes |
+| 12 | `script12_play_pick_place_ppo.py` | 9 | yes |
+
+학교 실행 절차와 단계별 PASS 기준: **[docs/school_runtime_checklist.md](docs/school_runtime_checklist.md)**
 
 ```bash
-# 1. clone / pull
-git clone <repo-url> ~/Projects/dume-isaac   # 또는: cd ~/Projects/dume-isaac && git pull
-
-# 2. 환경 진단 (Isaac Lab을 실행하는 바로 그 Python으로 실행할 것)
-python scripts/check_environment.py
-#   Isaac Lab 소스 설치라면 예: ./isaaclab.sh -p ~/Projects/dume-isaac/scripts/check_environment.py
-#   패키지를 실제 import까지 시도하려면: --try-import
-
-# 3. 정확한 버전 기록 → docs/environment.md 에 결과 붙여넣기
-#    OS / GPU / driver / Python / Isaac Sim / Isaac Lab / PyTorch / CUDA / 설치 경로
-
-# 4. SO101_CFG 존재 여부 확인
-#    check_environment.py 의 "SO-101 asset search" 항목 확인 (isaaclab_assets 소스를 텍스트 검색만 함)
-
-# 5. 없으면: 표준 TheRobotStudio SO-101 URDF → USD import
-#    (공식 SO-ARM100 repo에서 직접 받아 출처/커밋을 기록. 이 repo에 임의로 커밋하지 않음)
-python scripts/inspect_so101_urdf.py <path/to/so101.urdf>
-#    → Isaac Sim URDF importer 또는 Isaac Lab convert_urdf.py로 USD 변환
-
-# 6. joint smoke test  (Phase 1, 환경 확인 후 작성)
-# 7. tabletop scene    (Phase 2, configs/tabletop.yaml 실측 후 작성)
+cd ~/Projects/dume-isaac && git pull
+export ISAACLAB=<ISAACLAB_PATH>/isaaclab.sh
+$ISAACLAB -p scripts/script01_check_environment.py --try-import
+python scripts/script02_fetch_so101_source.py
+python scripts/script03_inspect_so101_urdf.py
+$ISAACLAB -p scripts/script04_convert_so101_to_usd.py --headless
+# ... Stage 3-9: checklist 참조
 ```
 
-## 집에서 (Isaac 없이) 검증
+## 테스트 종류
 
-```bash
-python3 scripts/check_environment.py
-python3 scripts/inspect_so101_urdf.py           # 사용법 출력
-python3 -m pytest -q
-```
+| 종류 | 어디서 | 명령 | 범위 |
+|---|---|---|---|
+| A. Home static/unit | 집 (Isaac 없음) | `python3 -m pytest -q` | 문법, Isaac-free import, YAML/manifest/mapping, parser, checkpoint 해석, 문서 필수 항목, Isaac 없을 때 graceful exit |
+| B. Isaac runtime | 학교만 | `scripts/script04`–`script12` | 실제 USD 변환, 물리, env 생성, PPO |
+
+A가 통과해도 B는 검증된 것이 아니다. Isaac 코드를 mock으로 PASS시키지 않는다.
 
 ## 구조
 
 ```
-dume_isaac/          Python 패키지 (assets / envs / tasks / actor — 현재 placeholder)
-configs/             시뮬레이션 설정 (미측정 값은 null)
-scripts/             진단 / URDF 검사 도구 (stdlib 전용)
-docs/                환경 기록, 로드맵, 실물 스펙, real↔sim 계약
-tests/               Isaac 없이 도는 구조 테스트
+configs/            my_so101.yaml (매핑/actuator), tabletop.yaml (실측 null + provisional),
+                    reach.yaml, pick_place.yaml (reward/threshold/difficulty)
+dume_isaac/
+  assets/my_so101/  spec.py (pure), robot_cfg.py (MY_SO101_CFG), source_manifest.yaml, urdf/, usd/
+  envs/tabletop/    layout.py (pure), scene_cfg.py, env_cfg.py, frames.py
+  tasks/            registry.py (pure), reach/, pick_place/ (env cfg, mdp/, agents/rsl_rl_ppo_cfg.py)
+  runtime/          app.py (AppLauncher 경계), rsl_rl_runner.py, checkpoints.py, single_robot.py
+  actor/            (Phase 4, 비어 있음)
+scripts/            script01 … script12
+docs/               environment, roadmap, real_robot_spec, real_sim_contract, school_runtime_checklist
+tests/              home static/unit tests
 ```
+
+Isaac에 의존하는 모듈은 패키지 `__init__`에서 import하지 않는다. 스크립트가
+`dume_isaac.runtime.app.launch_app()`으로 앱을 띄운 뒤에만 import된다.

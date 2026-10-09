@@ -1,49 +1,54 @@
-# 학교 환경 기록
+# 실행 환경 기록
 
-학교 노트북에서 **실제로 확인한 값만** 기록한다. 추정치(예: "Isaac Sim 5.1.x / Python 3.11")는
-확인 전까지 아래 표에 넣지 않는다.
+## 확정된 학교 runtime (compatibility target)
 
-기록 날짜: TODO
-머신 이름 / 자산 번호: TODO
+| 항목 | 값 | 상태 |
+|---|---|---|
+| Isaac Sim | 5.1.0 | 확정 |
+| Isaac Lab | v2.3.2 | 확정 |
+| Python | 3.11 | 확정 |
+| GPU | RTX 5060 Laptop | 확정 |
+
+코드/API는 Isaac Lab v2.3.2 기준이다. Isaac Lab 3.x / develop, Isaac Sim 6.x API는 쓰지 않는다.
+Isaac Lab v2.3.2에는 기본 `SO101_CFG`가 없으므로 이 repo의 `MY_SO101_CFG`를 쓴다.
+Isaac Sim / Isaac Lab은 pip dependency가 아니며, 학교에 설치된 Isaac Lab 환경을 그대로 쓴다.
+
+## 학교에서 추가 확인 (pending)
 
 | 항목 | 값 | 확인 방법 |
 |---|---|---|
-| OS | TODO | `cat /etc/os-release` 또는 Windows 설정 |
-| GPU | TODO | `nvidia-smi` |
-| NVIDIA driver | TODO | `nvidia-smi` |
-| Python | TODO | `check_environment.py` (Isaac Lab을 실행하는 interpreter 기준) |
-| Isaac Sim | TODO | `check_environment.py`, Isaac Sim 설치 폴더의 `VERSION` |
-| Isaac Lab | TODO | `check_environment.py`, Isaac Lab repo의 `git describe --tags` |
-| PyTorch | TODO | `check_environment.py` |
-| CUDA (torch) | TODO | `check_environment.py` |
-| Isaac Sim 설치 경로 | TODO | |
-| Isaac Lab 설치 경로 | TODO | |
-| 가상환경 (conda / venv / isaaclab.sh -p) | TODO | |
-| 실행 방식 (예: `./isaaclab.sh -p`) | TODO | |
-| SO-101 builtin cfg 존재 여부 | TODO | `check_environment.py`의 SO-101 asset search |
+| OS | pending | `cat /etc/os-release` 또는 Windows 설정 |
+| NVIDIA driver | pending | `nvidia-smi` |
+| CUDA runtime | pending | `script01_check_environment.py` (torch CUDA) / `nvidia-smi` |
+| PyTorch | pending | `script01_check_environment.py` |
+| Isaac Lab path | pending | Isaac Lab clone 위치 (`isaaclab.sh`가 있는 폴더) |
+| Python executable | pending | `script01_check_environment.py`의 Executable |
+| Isaac launch command | pending | 예: `~/IsaacLab/isaaclab.sh -p` |
 
 ## 실행 명령
 
 ```bash
 cd ~/Projects/dume-isaac
-python scripts/check_environment.py
-# Isaac Lab interpreter로:
-#   <ISAACLAB_PATH>/isaaclab.sh -p scripts/check_environment.py
-# import까지 시도:
-#   ... scripts/check_environment.py --try-import
+<ISAACLAB_PATH>/isaaclab.sh -p scripts/script01_check_environment.py --try-import
 ```
 
-## check_environment.py 출력 (기본 interpreter)
+## script01_check_environment.py 출력 (Isaac Lab interpreter, --try-import)
 
 ```text
 (여기에 붙여넣기)
 ```
 
-## check_environment.py 출력 (Isaac Lab interpreter, --try-import)
+## 집 환경 (참고, Isaac 없음)
 
-```text
-(여기에 붙여넣기)
-```
+| 항목 | 값 |
+|---|---|
+| OS | Ubuntu 24.04 (WSL2) |
+| Python | 3.12 |
+| GPU | RTX 3050 |
+| Isaac Sim / Isaac Lab / PyTorch | 없음 |
+
+집에서는 **A. static/unit test**만 가능하다 (`python3 -m pytest -q`).
+Isaac runtime 검증(**B**)은 학교에서 [school_runtime_checklist.md](school_runtime_checklist.md) 순서로 한다.
 
 ## 메모
 

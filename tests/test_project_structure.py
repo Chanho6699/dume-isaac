@@ -11,7 +11,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 
 REQUIRED_DIRS = [
-    "dume_isaac/assets/brainus_so101",
+    "dume_isaac/assets/my_so101",
     "dume_isaac/envs/tabletop",
     "dume_isaac/tasks/pick_place",
     "dume_isaac/actor",
@@ -24,20 +24,20 @@ REQUIRED_FILES = [
     ".gitignore",
     "pyproject.toml",
     "dume_isaac/__init__.py",
-    "dume_isaac/assets/brainus_so101/README.md",
-    "dume_isaac/assets/brainus_so101/robot_spec.yaml",
-    "configs/brainus_so101.yaml",
+    "dume_isaac/assets/my_so101/README.md",
+    "dume_isaac/assets/my_so101/robot_spec.yaml",
+    "configs/my_so101.yaml",
     "configs/tabletop.yaml",
-    "scripts/check_environment.py",
-    "scripts/inspect_so101_urdf.py",
+    "scripts/script01_check_environment.py",
+    "scripts/script03_inspect_so101_urdf.py",
     "docs/environment.md",
     "docs/roadmap.md",
     "docs/real_robot_spec.md",
     "docs/real_sim_contract.md",
 ]
 YAML_FILES = [
-    "dume_isaac/assets/brainus_so101/robot_spec.yaml",
-    "configs/brainus_so101.yaml",
+    "dume_isaac/assets/my_so101/robot_spec.yaml",
+    "configs/my_so101.yaml",
     "configs/tabletop.yaml",
 ]
 
@@ -80,7 +80,7 @@ def test_yaml_parses(rel):
 
 def test_robot_spec_content():
     yaml = pytest.importorskip("yaml")
-    spec = yaml.safe_load((ROOT / "dume_isaac/assets/brainus_so101/robot_spec.yaml").read_text())
+    spec = yaml.safe_load((ROOT / "dume_isaac/assets/my_so101/robot_spec.yaml").read_text())
     assert spec["arm_joints"] == 5
     assert spec["gripper_joints"] == 1
     assert spec["total_actuated_joints"] == 6
@@ -99,7 +99,7 @@ def test_tabletop_has_no_invented_dimensions():
 
 def test_check_environment_import_has_no_side_effects(capsys):
     torch_loaded_before = "torch" in sys.modules
-    module = _load_script("check_environment")
+    module = _load_script("script01_check_environment")
     out = capsys.readouterr()
     assert out.out == "" and out.err == ""
     assert callable(module.main)
@@ -110,7 +110,7 @@ def test_check_environment_import_has_no_side_effects(capsys):
 
 
 def test_check_environment_runs(capsys):
-    module = _load_script("check_environment")
+    module = _load_script("script01_check_environment")
     assert module.main([]) == 0
     out = capsys.readouterr().out
     assert "=== DUM-E Isaac Environment Check ===" in out
@@ -118,7 +118,7 @@ def test_check_environment_runs(capsys):
 
 
 def test_inspect_urdf_missing_file(capsys, tmp_path):
-    module = _load_script("inspect_so101_urdf")
+    module = _load_script("script03_inspect_so101_urdf")
     assert module.main([str(tmp_path / "nope.urdf")]) == 2
     assert "not found" in capsys.readouterr().err
 
@@ -133,7 +133,7 @@ def test_inspect_urdf_parses_minimal_urdf(capsys, tmp_path):
         '<axis xyz="0 0 1"/><limit lower="-1" upper="1" effort="2" velocity="3"/></joint>'
         "</robot>"
     )
-    module = _load_script("inspect_so101_urdf")
+    module = _load_script("script03_inspect_so101_urdf")
     assert module.main([str(urdf)]) == 0
     out = capsys.readouterr().out
     assert "Robot name : toy" in out

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only environment diagnostic for dume-isaac.
+"""Stage 0: read-only environment diagnostic for dume-isaac.
 
 Prints Python / platform / PyTorch / CUDA / GPU / Isaac Sim / Isaac Lab information.
 It never installs or modifies anything, and never dies with a traceback: every probe
@@ -10,8 +10,8 @@ not imported, because importing them may start Kit or require a running Simulati
 Pass --try-import to also attempt a plain `import isaacsim` / `import isaaclab`.
 
 Run it with the same interpreter you use for Isaac Lab, e.g.:
-    python scripts/check_environment.py
-    ./isaaclab.sh -p /path/to/dume-isaac/scripts/check_environment.py
+    python scripts/script01_check_environment.py
+    ./isaaclab.sh -p /path/to/dume-isaac/scripts/script01_check_environment.py
 """
 
 from __future__ import annotations
@@ -36,6 +36,11 @@ ISAAC_ENV_VARS = ("ISAAC_PATH", "ISAACSIM_PATH", "CARB_APP_PATH", "EXP_PATH", "I
 VENV_ENV_VARS = ("VIRTUAL_ENV", "CONDA_PREFIX", "CONDA_DEFAULT_ENV")
 EXTRA_PACKAGES = ("torch", "torchvision", "numpy", "gymnasium", "rsl-rl-lib", "skrl", "rl-games", "pyyaml")
 SO101_PATTERN = re.compile(r"SO[_-]?101|SO[_-]?ARM", re.IGNORECASE)
+
+# Confirmed school runtime (docs/environment.md). Compatibility target, not a requirement.
+TARGET_ISAAC_SIM = "5.1.0"
+TARGET_ISAAC_LAB = "2.3.2"
+TARGET_PYTHON = "3.11"
 
 
 def _err(exc: BaseException) -> str:
@@ -324,7 +329,7 @@ def print_report(sysinfo, torch_info, smi, sim, lab, so101) -> None:
         for h in so101["hits"]:
             print(f"  {h}")
     else:
-        print("  no SO-101 references found -> plan: import standard SO-101 URDF to USD")
+        print("  no SO-101 references found (expected for Isaac Lab v2.3.2) -> use this repo's MY_SO101_CFG")
     if so101["error"]:
         print(f"  error: {so101['error']}")
 
@@ -349,6 +354,8 @@ def print_report(sysinfo, torch_info, smi, sim, lab, so101) -> None:
     print(f"Isaac Sim : {sim['status']}" + (f"  [{sim_ver}]" if sim_ver else ""))
     print(f"Isaac Lab : {lab['status']}" + (f"  [{lab_ver}]" if lab["dists"] else ""))
     print(f"SO-101 cfg: {so101_line}")
+    print(f"Target    : Isaac Sim {TARGET_ISAAC_SIM} / Isaac Lab v{TARGET_ISAAC_LAB} / Python {TARGET_PYTHON}"
+          f"  (python {'match' if sysinfo['python'].startswith(TARGET_PYTHON + '.') else 'MISMATCH'})")
     print("\nCopy this whole output into docs/environment.md.")
 
 

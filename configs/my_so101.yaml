@@ -1,0 +1,120 @@
+# my_so101 — simulation-side config for the SO-101 robot (canonical name: my_so101).
+# Physical facts: dume_isaac/assets/my_so101/robot_spec.yaml
+# Upstream source pin: dume_isaac/assets/my_so101/source_manifest.yaml
+#
+# This file is the ONE place that maps logical joint/frame names to the actual
+# URDF/USD names. All tasks read it through dume_isaac.assets.my_so101.spec.
+# If the converted USD uses different names, change only the `joints` / `frames` values here.
+#
+# Status words:
+#   upstream                     = copied from the pinned TheRobotStudio source
+#   provisional simulation value = chosen for simulation only; NOT a Brain Us measurement
+
+robot:
+  asset_source: TheRobotStudio SO-101          # standard design used for the sim model
+  physical_reference: Brain Us SO-101 follower # the real robot this sim must match
+
+asset:
+  method: urdf_import            # Isaac Lab v2.3.2 has no built-in SO101 config
+  source_manifest: dume_isaac/assets/my_so101/source_manifest.yaml
+  urdf_path: dume_isaac/assets/my_so101/urdf/so101_new_calib.urdf
+  usd_path: dume_isaac/assets/my_so101/usd/my_so101.usd
+  converter:                     # used by scripts/script04_convert_so101_to_usd.py
+    fix_base: true               # fixed-base tabletop arm
+    # Keep fixed joints: the only one is gripper_frame_joint (gripper_link -> gripper_frame_link,
+    # the upstream TCP frame). Keeping it gives Reach / PickPlace a real EE body.
+    # Known risk: gripper_frame_link is massless in the URDF (mass 1e-9, zero inertia).
+    # If Stage 2/3 fails because of it, use the fallback documented under `frames`.
+    merge_fixed_joints: false
+    # Convex hull of gripper_link would fill the gap between the jaws and make
+    # grasping impossible, so use convex decomposition.
+    collider_type: convex_decomposition
+    self_collision: false
+    make_instanceable: true
+    joint_drive:                 # USD default drive; runtime actuators below override it
+      target_type: position
+      drive_type: force
+      stiffness: 17.8            # upstream joints_properties.xml (sts3215 kp)
+      damping: 0.60              # upstream joints_properties.xml (sts3215 damping)
+
+# logical name -> actual URDF/USD joint name (upstream so101_new_calib.urdf names)
+joints:
+  shoulder_pan: shoulder_pan
+  shoulder_lift: shoulder_lift
+  elbow_flex: elbow_flex
+  wrist_flex: wrist_flex
+  wrist_roll: wrist_roll
+  gripper: gripper
+
+arm_joints: [shoulder_pan, shoulder_lift, elbow_flex, wrist_flex, wrist_roll]  # logical, action order
+gripper_joint: gripper                                                          # logical
+
+frames:
+  base: base_link
+  end_effector:
+    body: gripper_frame_link   # upstream TCP frame, preserved by merge_fixed_joints: false
+    offset: [0.0, 0.0, 0.0]
+  # Fallback if the converted USD must merge fixed joints (merge_fixed_joints: true):
+  #   body: gripper_link
+  #   offset: [-0.0079, -0.000218121, -0.0981274]   # upstream gripper_frame_joint origin xyz
+  # script03 --check-mapping validates whichever variant is configured.
+
+# Upstream "new calibration": each joint's zero is the middle of its range.
+# Home = all zeros is a provisional simulation value, not the Brain Us rest pose.
+home_joint_pos:
+  shoulder_pan: 0.0
+  shoulder_lift: 0.0
+  elbow_flex: 0.0
+  wrist_flex: 0.0
+  wrist_roll: 0.0
+  gripper: 0.0
+
+# provisional simulation value. URDF gripper range is [-0.174533, 1.74533] rad;
+# which end is "open" must be confirmed visually in Stage 4 (joint motion test).
+gripper:
+  open: 1.2
+  closed: -0.15
+
+# Runtime actuators (Isaac Lab ImplicitActuatorCfg).
+# provisional simulation value — taken from the upstream STS3215 MuJoCo defaults
+# (Simulation/SO101/joints_properties.xml, itself adapted from Open Duck Mini).
+# NOT identified on the Brain Us robot.
+actuators:
+  status: provisional simulation value
+  arm:
+    joints: [shoulder_pan, shoulder_lift, elbow_flex, wrist_flex, wrist_roll]
+    stiffness: 17.8
+    damping: 0.60
+    armature: 0.028
+    effort_limit_sim: 3.35       # upstream actuator forcerange
+    velocity_limit_sim: null     # keep USD value (URDF velocity=10, upstream placeholder)
+  gripper:
+    joints: [gripper]
+    stiffness: 17.8
+    damping: 0.60
+    armature: 0.028
+    effort_limit_sim: 3.35
+    velocity_limit_sim: null
+  # upstream frictionloss (0.052 N·m, MuJoCo) is NOT mapped: PhysX joint friction has
+  # different semantics, so friction stays at the USD default for now.
+
+smoke_test:                     # scripts/script05_smoke_test_so101.py
+  sim_dt: 0.01
+  steps: 300
+  max_joint_vel: 20.0           # rad/s; above this the asset is considered unstable
+  max_home_error_warn: 0.10     # rad
+  max_home_error_fail: 0.50     # rad
+  max_base_drift: 0.001         # m (fixed base must not move)
+
+joint_motion_test:              # scripts/script06_test_joint_motion.py
+  sim_dt: 0.01
+  delta_rad: 0.25
+  settle_steps: 150
+  pass_tol_rad: 0.05
+  warn_tol_rad: 0.15
+
+calibration:                    # Brain Us real robot <-> sim, all pending
+  joint_zero: pending
+  joint_limits: pending
+  actuator_model: pending
+  gripper_mapping: pending      # real gripper 0..100 <-> sim jaw angle

@@ -1,6 +1,6 @@
 # Real robot spec — Brain Us SO-101 follower
 
-기계 판독용 사본: [robot_spec.yaml](../dume_isaac/assets/brainus_so101/robot_spec.yaml)
+기계 판독용 사본: [robot_spec.yaml](../dume_isaac/assets/my_so101/robot_spec.yaml) (repo 내 canonical 이름: `my_so101`)
 
 ## 확인됨
 
@@ -23,3 +23,10 @@
 | response speed / overshoot | TODO | step 명령에 대한 joint 응답 기록 → sim actuator gain 튜닝 근거 |
 
 검증 완료 시 `robot_spec.yaml`의 `verification.*` 플래그를 `true`로 바꾸고 근거를 여기 남긴다.
+
+## 시뮬레이션에서 쓰는 값과의 관계
+
+시뮬레이션의 inertia, friction, stiffness, damping, joint zero, joint limit, backlash는
+공식 TheRobotStudio URDF/MJCF 값 또는 **provisional simulation value**이며, 위 표의
+Brain Us 실물 측정이 끝나기 전까지 실물 검증값이 아니다
+([configs/my_so101.yaml](../configs/my_so101.yaml) 참조).

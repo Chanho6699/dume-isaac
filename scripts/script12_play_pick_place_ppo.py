@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+"""Stage 9b: play a trained pick-place PPO checkpoint.
+
+    <isaaclab.sh -p> scripts/script12_play_pick_place_ppo.py [--load_run <run>] [--checkpoint model_2999.pt] [--num_envs 16]
+
+Flow mirrors Isaac Lab v2.3.2 scripts/reinforcement_learning/rsl_rl; see
+dume_isaac/runtime/rsl_rl_runner.py. Logs: logs/rsl_rl/<experiment>/<timestamp>[_run_name]/.
+"""
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from dume_isaac.runtime.rsl_rl_runner import run_play  # noqa: E402
+
+if __name__ == "__main__":
+    sys.exit(run_play("pick_place"))

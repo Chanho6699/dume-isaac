@@ -1,6 +1,16 @@
-# Tabletop pick-and-place scene config.
-# All dimensions are null until measured on the real setup. Units: meters, radians.
-# Do not fill with guessed numbers.
+# Tabletop pick-and-place scene config. Units: meters, radians.
+#
+# Two layers:
+#   (1) top-level keys (table, robot_base, workspace_bounds, objects, cameras)
+#       = REAL MEASUREMENTS. null until measured on the real DUM-E setup. Never guess here.
+#   (2) provisional_defaults = simulation-only values used while (1) is null.
+# The loader (dume_isaac/envs/tabletop/layout.py) uses the measured value when present,
+# otherwise the provisional default, and reports which one was used.
+#
+# Frames:
+#   table frame : origin at the table-top center, +x = robot forward, +y = left, +z = up
+#   base frame  : robot base_link (robot sits on the table top, facing +x)
+#   table width = extent along y, table depth = extent along x
 
 scene_type: fixed_base_tabletop
 
@@ -13,7 +23,7 @@ robot_base:
   position: null     # TODO: [x, y, z] in table frame
   orientation: null  # TODO: quaternion [w, x, y, z]
 
-workspace_bounds:
+workspace_bounds:    # in robot base frame
   x: null  # TODO: [min, max]
   y: null  # TODO: [min, max]
   z: null  # TODO: [min, max]
@@ -32,3 +42,62 @@ cameras:
   wrist:
     mount_offset: null # TODO
     intrinsics: null   # TODO
+
+# ---------------------------------------------------------------------------
+# provisional simulation values (NOT measurements). Replace by filling (1) above.
+provisional_defaults:
+  table:
+    width: 1.2
+    depth: 0.8
+    height: 0.75
+  robot_base:
+    position: [-0.25, 0.0, 0.0]       # near the back edge, on the table top
+    orientation: [1.0, 0.0, 0.0, 0.0]
+  workspace_bounds:
+    x: [0.10, 0.32]
+    y: [-0.20, 0.20]
+    z: [0.0, 0.30]
+  objects:
+    cube:
+      size: 0.03
+      mass: 0.03                      # kg
+      friction: 1.0                   # static = dynamic
+    bin:
+      # First version is a flat target pad (no walls, no collision). size = [width(y), depth(x)].
+      kind: flat_pad
+      size: [0.08, 0.08]
+
+# ---------------------------------------------------------------------------
+# Randomization ranges per difficulty (robot base frame, provisional simulation values).
+# Pick the level with --difficulty easy|medium|wide. Start PPO with easy.
+randomization:
+  easy:
+    robot_joint_noise: 0.05           # rad, uniform offset around home
+    cube_x: [0.18, 0.22]
+    cube_y: [-0.03, 0.03]
+    target_x: [0.18, 0.22]
+    target_y: [0.10, 0.14]
+    min_separation: 0.06
+    reach_x: [0.16, 0.24]
+    reach_y: [-0.06, 0.06]
+    reach_z: [0.10, 0.16]
+  medium:
+    robot_joint_noise: 0.10
+    cube_x: [0.15, 0.26]
+    cube_y: [-0.10, 0.10]
+    target_x: [0.15, 0.26]
+    target_y: [-0.15, 0.15]
+    min_separation: 0.08
+    reach_x: [0.13, 0.28]
+    reach_y: [-0.12, 0.12]
+    reach_z: [0.06, 0.20]
+  wide:
+    robot_joint_noise: 0.20
+    cube_x: [0.12, 0.30]
+    cube_y: [-0.18, 0.18]
+    target_x: [0.12, 0.30]
+    target_y: [-0.18, 0.18]
+    min_separation: 0.08
+    reach_x: [0.10, 0.32]
+    reach_y: [-0.20, 0.20]
+    reach_z: [0.03, 0.25]

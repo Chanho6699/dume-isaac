@@ -1,0 +1,69 @@
+# Provenance of the SO-101 simulation source files.
+# Only official TheRobotStudio files, pinned to one upstream commit, verified by sha256.
+# Fetch / verify with:  python scripts/script02_fetch_so101_source.py [--verify-only]
+#
+# Fetched files are NOT committed by default (see .gitignore); this manifest is.
+
+upstream:
+  repository: https://github.com/TheRobotStudio/SO-ARM100
+  license: Apache-2.0
+  commit: a758567c3978dfeefe282ede0500085a48fe8f78
+  commit_date: "2026-10-06T09:26:52+02:00"
+  subdirectory: Simulation/SO101
+  pinned_on: "2026-10-09"
+
+selected_model:
+  file: so101_new_calib.urdf
+  reason: >-
+    Follower arm, "new calibration" (each joint zero = middle of its range), which is
+    the default in the upstream README. Whether it matches the Brain Us calibration
+    is NOT verified.
+
+local_modifications: none   # files are byte-identical to upstream; mesh paths kept as "assets/*.stl"
+
+files:
+  - upstream_path: LICENSE
+    local_path: dume_isaac/assets/my_so101/urdf/LICENSE
+    sha256: c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4
+  - upstream_path: Simulation/SO101/so101_new_calib.urdf
+    local_path: dume_isaac/assets/my_so101/urdf/so101_new_calib.urdf
+    sha256: 3a65d2d35e68a8d2f0c2cc176d19b884506543c93ba72980145b80abe276022c
+  - upstream_path: Simulation/SO101/assets/base_motor_holder_so101_v1.stl
+    local_path: dume_isaac/assets/my_so101/urdf/assets/base_motor_holder_so101_v1.stl
+    sha256: 8cd2f241037ea377af1191fffe0dd9d9006beea6dcc48543660ed41647072424
+  - upstream_path: Simulation/SO101/assets/base_so101_v2.stl
+    local_path: dume_isaac/assets/my_so101/urdf/assets/base_so101_v2.stl
+    sha256: bb12b7026575e1f70ccc7240051f9d943553bf34e5128537de6cd86fae33924d
+  - upstream_path: Simulation/SO101/assets/motor_holder_so101_base_v1.stl
+    local_path: dume_isaac/assets/my_so101/urdf/assets/motor_holder_so101_base_v1.stl
+    sha256: 31242ae6fb59d8b15c66617b88ad8e9bded62d57c35d11c0c43a70d2f4caa95b
+  - upstream_path: Simulation/SO101/assets/motor_holder_so101_wrist_v1.stl
+    local_path: dume_isaac/assets/my_so101/urdf/assets/motor_holder_so101_wrist_v1.stl
+    sha256: 887f92e6013cb64ea3a1ab8675e92da1e0beacfd5e001f972523540545e08011
+  - upstream_path: Simulation/SO101/assets/moving_jaw_so101_v1.stl
+    local_path: dume_isaac/assets/my_so101/urdf/assets/moving_jaw_so101_v1.stl
+    sha256: 785a9dded2f474bc1d869e0d3dae398a3dcd9c0c345640040472210d2861fa9d
+  - upstream_path: Simulation/SO101/assets/rotation_pitch_so101_v1.stl
+    local_path: dume_isaac/assets/my_so101/urdf/assets/rotation_pitch_so101_v1.stl
+    sha256: 9be900cc2a2bf718102841ef82ef8d2873842427648092c8ed2ca1e2ef4ffa34
+  - upstream_path: Simulation/SO101/assets/sts3215_03a_no_horn_v1.stl
+    local_path: dume_isaac/assets/my_so101/urdf/assets/sts3215_03a_no_horn_v1.stl
+    sha256: 75ef3781b752e4065891aea855e34dc161a38a549549cd0970cedd07eae6f887
+  - upstream_path: Simulation/SO101/assets/sts3215_03a_v1.stl
+    local_path: dume_isaac/assets/my_so101/urdf/assets/sts3215_03a_v1.stl
+    sha256: a37c871fb502483ab96c256baf457d36f2e97afc9205313d9c5ab275ef941cd0
+  - upstream_path: Simulation/SO101/assets/under_arm_so101_v1.stl
+    local_path: dume_isaac/assets/my_so101/urdf/assets/under_arm_so101_v1.stl
+    sha256: d01d1f2de365651dcad9d6669e94ff87ff7652b5bb2d10752a66a456a86dbc71
+  - upstream_path: Simulation/SO101/assets/upper_arm_so101_v1.stl
+    local_path: dume_isaac/assets/my_so101/urdf/assets/upper_arm_so101_v1.stl
+    sha256: 475056e03a17e71919b82fd88ab9a0b898ab50164f2a7943652a6b2941bb2d4f
+  - upstream_path: Simulation/SO101/assets/waveshare_mounting_plate_so101_v2.stl
+    local_path: dume_isaac/assets/my_so101/urdf/assets/waveshare_mounting_plate_so101_v2.stl
+    sha256: e197e24005a07d01bbc06a8c42311664eaeda415bf859f68fa247884d0f1a6e9
+  - upstream_path: Simulation/SO101/assets/wrist_roll_follower_so101_v1.stl
+    local_path: dume_isaac/assets/my_so101/urdf/assets/wrist_roll_follower_so101_v1.stl
+    sha256: 4b17b410a12d64ec39554abc3e8054d8a97384b2dc4a8d95a5ecb2a93670f5f4
+  - upstream_path: Simulation/SO101/assets/wrist_roll_pitch_so101_v2.stl
+    local_path: dume_isaac/assets/my_so101/urdf/assets/wrist_roll_pitch_so101_v2.stl
+    sha256: 6c7ec5525b4d8b9e397a30ab4bb0037156a5d5f38a4adf2c7d943d6c56eda5ae

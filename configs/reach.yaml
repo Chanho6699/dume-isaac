@@ -1,0 +1,27 @@
+# Reach sanity task (full state, no cameras). All numbers are initial baselines.
+# Structure and weights follow the Isaac Lab v2.3.2 manipulation/reach task
+# (isaaclab_tasks/manager_based/manipulation/reach/reach_env_cfg.py); position only,
+# and tanh std scaled down for the smaller SO-101 workspace.
+
+difficulty: easy            # default; override with --difficulty
+
+sim:
+  dt: 0.016666666666666666  # 1/60 s, as the official reach task
+  decimation: 2
+episode_length_s: 12.0
+
+command:
+  resampling_time_s: 4.0
+  debug_vis: true
+
+actions:
+  arm_scale: 0.5            # official reach: JointPositionAction scale 0.5, default offset
+
+rewards:
+  distance:      {weight: -0.2}               # official: end_effector_position_tracking
+  distance_tanh: {weight: 0.1, std: 0.05}     # official: fine-grained, std 0.1 (scaled)
+  reached:       {weight: 0.2, threshold: 0.02}
+  action_rate:   {weight: -1.0e-4, final_weight: -5.0e-3, curriculum_steps: 4500}
+  joint_vel:     {weight: -1.0e-4, final_weight: -1.0e-3, curriculum_steps: 4500}
+
+terminate_on_success: false
