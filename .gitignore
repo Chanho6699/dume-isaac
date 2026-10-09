@@ -1,0 +1,54 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Training / experiment outputs ---
+checkpoints/
+outputs/
+logs/
+runs/
+wandb/
+datasets/
+synthetic_data/
+videos/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# --- Isaac Sim / Isaac Lab local files ---
+# Isaac Lab convention: symlink to the local Isaac Sim install
+_isaac_sim
+# Omniverse / Kit caches and thumbnails
+.thumbs/
+.nvidia-omniverse/
+kit_cache/
+*.usd.lock
+*.usda.lock
+# Converter scratch output. Put generated/intermediate USD under a `_generated/`
+# directory; promote a small final USD out of it explicitly when it should be tracked.
+# (Do NOT blanket-ignore *.usd / *.urdf — curated assets may be committed later.)
+**/_generated/
+*.usd.bak
+*.usda.bak
+
+# --- OS / editor junk ---
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.idea/
+.vscode/

@@ -1,0 +1,22 @@
+# Brain Us SO-101 follower — physical robot facts.
+# Only confirmed facts are listed. Unknown geometry/dynamics (link lengths, masses,
+# inertia, friction, damping) are deliberately omitted — do not invent them.
+
+manufacturer: Brain Us
+model: SO-101 follower
+base_design: TheRobotStudio SO-101
+
+arm_joints: 5
+gripper_joints: 1
+total_actuated_joints: 6
+
+actuator:
+  model: Feetech ST-3215-C018
+  voltage: 12V
+  gear_ratio: "1:345"
+
+verification:
+  joint_zero_verified: false
+  joint_limits_verified: false
+  gripper_mapping_verified: false
+  dynamics_verified: false

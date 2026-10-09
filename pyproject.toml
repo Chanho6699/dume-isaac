@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dume-isaac"
+version = "0.0.1"
+description = "Isaac Sim / Isaac Lab simulation and learning experiments for the Brain Us SO-101 follower"
+readme = "README.md"
+requires-python = ">=3.11"
+# Isaac Sim / Isaac Lab / PyTorch are intentionally NOT listed: they come from the
+# local Isaac installation, whose exact versions are recorded in docs/environment.md.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest", "pyyaml"]
+
+[tool.setuptools.packages.find]
+include = ["dume_isaac*"]
+
+[tool.setuptools.package-data]
+"dume_isaac.assets" = ["**/*.yaml", "**/*.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

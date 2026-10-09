@@ -1,0 +1,34 @@
+# Tabletop pick-and-place scene config.
+# All dimensions are null until measured on the real setup. Units: meters, radians.
+# Do not fill with guessed numbers.
+
+scene_type: fixed_base_tabletop
+
+table:
+  width: null   # TODO: measure
+  depth: null   # TODO: measure
+  height: null  # TODO: measure
+
+robot_base:
+  position: null     # TODO: [x, y, z] in table frame
+  orientation: null  # TODO: quaternion [w, x, y, z]
+
+workspace_bounds:
+  x: null  # TODO: [min, max]
+  y: null  # TODO: [min, max]
+  z: null  # TODO: [min, max]
+
+objects:
+  cube:
+    size: null  # TODO: edge length
+  bin:
+    size: null  # TODO: [width, depth, height]
+
+cameras:
+  external:
+    position: null     # TODO: R3D camera pose relative to robot base
+    orientation: null  # TODO
+    intrinsics: null   # TODO
+  wrist:
+    mount_offset: null # TODO
+    intrinsics: null   # TODO
