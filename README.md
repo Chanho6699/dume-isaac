@@ -1,6 +1,6 @@
 # dume-isaac
 
-Brain Us SO-101 follower를 위한 **Isaac Sim / Isaac Lab 전용 시뮬레이션·학습 실험 repo**.
+Project-Dum-E를 위한 **Isaac Sim / Isaac Lab 전용 시뮬레이션·학습 실험 repo**.
 
 | Repo | 역할 |
 |---|---|
